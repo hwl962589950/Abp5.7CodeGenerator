@@ -1,0 +1,16 @@
+﻿using Abp.Application.Services.Dto;
+using NewAliExpress.DbEntity;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}s.Dtos
+{
+	/// <summary>
+	/// 查询Id查询 {{Entity_Name_Here}} 
+	/// </summary>
+	public class Get{{Entity_Name_Here}}Input: EntityDto<{{Primary_Key_Inside_Tag_Here}}>
+	{
+			
+	}
+}

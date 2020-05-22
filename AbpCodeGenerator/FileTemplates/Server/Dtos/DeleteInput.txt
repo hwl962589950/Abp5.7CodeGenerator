@@ -1,0 +1,15 @@
+﻿using Abp.Application.Services.Dto;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}s.Dtos
+{
+	/// <summary>
+	/// 删除 {{Entity_Name_Here}}  Dto模型
+	/// </summary>
+	public class Delete{{Namespace_Relative_Full_Here}}Input: EntityDto<{{Primary_Key_Inside_Tag_Here}}>
+	{
+		{{Property_Looped_Template_Here}}
+	}
+}

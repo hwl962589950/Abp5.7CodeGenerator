@@ -1,0 +1,47 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Abp.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using {{Namespace_Here}}.Authorization;
+using {{Namespace_Here}}.Controllers;
+using {{Namespace_Here}}.{{Entity_Name_Plural_Here}}s;
+using {{Namespace_Here}}.{{Entity_Name_Plural_Here}}s.Dtos;
+using {{Namespace_Here}}.Web.Models.{{Entity_Name_Plural_Here}};
+
+namespace {{Namespace_Here}}.Web.Controllers
+{
+
+    [AbpMvcAuthorize({{Entity_Name_Plural_Here}}Permissions.Node)]
+    public class {{Entity_Name_Plural_Here}}Controller : {{Controller_Base_Class}}ControllerBase
+    {
+        private readonly I{{Entity_Name_Plural_Here}}AppService _{{Entity_Name_Plural_Here_Low}}AppService;
+
+        public {{Entity_Name_Plural_Here}}Controller(I{{Entity_Name_Plural_Here}}AppService {{Entity_Name_Plural_Here_Low}}AppService)
+        {
+            this._{{Entity_Name_Plural_Here_Low}}AppService = {{Entity_Name_Plural_Here_Low}}AppService;
+        }
+
+        [AbpMvcAuthorize({{Entity_Name_Plural_Here}}Permissions.Query)]
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+        /// <summary>
+        /// 修改  {{Entity_Name_Plural_Here}}
+        /// </summary>
+        /// <returns></returns>
+        [AbpMvcAuthorize({{Entity_Name_Plural_Here}}Permissions.Edit)]
+        public async Task<IActionResult> EditModal({{Primary_Key_Here}}  Id)
+        {
+            var {{Entity_Name_Plural_Here_Low}} = await _{{Entity_Name_Plural_Here_Low}}AppService.GetAsync(new Get{{Entity_Name_Plural_Here}}Input() { Id=Id });
+            var model = new Edit{{Entity_Name_Plural_Here}}ModalViewModel
+            {
+                {{Entity_Name_Plural_Here}} = {{Entity_Name_Plural_Here_Low}}
+            };
+            return PartialView(model);
+
+        }
+    }
+}

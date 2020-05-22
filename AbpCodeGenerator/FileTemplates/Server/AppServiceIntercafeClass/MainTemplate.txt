@@ -1,23 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Abp.Application.Services;
-using Abp.Application.Services.Dto;
-using {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}s.Dtos;
-using {{Namespace_Here}}.Dto;
+﻿using Abp.Application.Services;
+using NewAliExpress.{{Entity_Name_Plural_Here}}s.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}s
+namespace {{Namespace_Here}}.{{Entity_Name_Plural_Here}}s
 {
-    public interface I{{Entity_Name_Plural_Here}}AppService : IApplicationService 
-    {
-        Task<PagedResultDto<{{Entity_Name_Plural_Here}}ListDto>> GetAll(Get{{Entity_Name_Plural_Here}}Input input);
-
-		Task<Get{{Entity_Name_Here}}ForEditOutput> Get{{Entity_Name_Here}}ForEdit(EntityDto<{{Primary_Key_Inside_Tag_Here}}> input);
-
-		Task CreateOrEdit(CreateOrEdit{{Entity_Name_Here}}Input input);
-
-		Task Delete(EntityDto<{{Primary_Key_Inside_Tag_Here}}> input);
-
-		Task<FileDto> Get{{Entity_Name_Here}}ToExcel(Get{{Entity_Name_Here}}Input input);
-
-    }
+	public interface I{{Entity_Name_Plural_Here}}AppService:IApplicationService,IAsyncCrudAppService<{{Entity_Name_Plural_Here}}DtoOut,{{Primary_Key_Inside_Tag_Here}}, GetAll{{Entity_Name_Plural_Here}}Input,Create{{Entity_Name_Plural_Here}}Input,Update{{Entity_Name_Plural_Here}}Input, Get{{Entity_Name_Plural_Here}}Input, Delete{{Entity_Name_Plural_Here}}Input>
+	{
+	}
 }

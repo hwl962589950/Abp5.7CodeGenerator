@@ -30,6 +30,8 @@ namespace AbpCodeGenerator.Lib
         /// </summary>
         public string Annotation { get; set; }
 
+
+        public Type FieldProp { get; set; }
         public static List<MetaTableInfo> GetMetaTableInfoListForMysql(string tableName)
         {
             var mysqlEntity = MysqlEntity.GetMysqlEntityByTableName(tableName);
@@ -40,7 +42,7 @@ namespace AbpCodeGenerator.Lib
                 {
                     Name = item.Name,
                     Annotation = item.Comment,
-                    PropertyType = item.Type
+                    PropertyType = item.Type,
                 };
                 metaTableInfoList.Add(metaTableInfo);
             }
@@ -49,7 +51,6 @@ namespace AbpCodeGenerator.Lib
         }
 
         /// <summary>
-        /// 根据类名 反射得到类的信息
         /// </summary>
         /// <param name="className">类名</param>
         /// <returns></returns>
@@ -89,6 +90,7 @@ namespace AbpCodeGenerator.Lib
                         {
                             metaTableInfo.Annotation = "";
                         }
+                        metaTableInfo.FieldProp = properties.PropertyType;
                         metaTableInfo.Name = properties.Name;
                         if (properties.PropertyType == typeof(int))
                         {

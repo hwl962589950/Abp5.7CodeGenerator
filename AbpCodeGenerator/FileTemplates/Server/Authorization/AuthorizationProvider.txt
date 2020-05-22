@@ -35,13 +35,13 @@ namespace {{Namespace_Here}}.Authorization
 		public override void SetPermissions(IPermissionDefinitionContext context)
 		{
 			// 在这里配置了{{Entity_Name_Plural_Here}} 的权限。
-			var class1 = context.CreatePermission(Class1Permissions.Node, L("Class1"));
-			class1.CreateChildPermission(Class1Permissions.Query, L("QueryClass1"));
-			class1.CreateChildPermission(Class1Permissions.Create, L("CreateClass1"));
-			class1.CreateChildPermission(Class1Permissions.Edit, L("EditClass1"));
-			class1.CreateChildPermission(Class1Permissions.Delete, L("DeleteClass1"));
-			class1.CreateChildPermission(Class1Permissions.BatchDelete, L("BatchDeleteClass1"));
-			class1.CreateChildPermission(Class1Permissions.ExportExcel, L("ExportToExcel"));
+			var class1 = context.CreatePermission({{Entity_Name_Plural_Here}}Permissions.Node, L("{{Entity_Name_Plural_Here}}"));
+			class1.CreateChildPermission({{Entity_Name_Plural_Here}}Permissions.Query, L("Query{{Entity_Name_Plural_Here}}"));
+			class1.CreateChildPermission({{Entity_Name_Plural_Here}}Permissions.Create, L("Create{{Entity_Name_Plural_Here}}"));
+			class1.CreateChildPermission({{Entity_Name_Plural_Here}}Permissions.Edit, L("Edit{{Entity_Name_Plural_Here}}"));
+			class1.CreateChildPermission({{Entity_Name_Plural_Here}}Permissions.Delete, L("Delete{{Entity_Name_Plural_Here}}"));
+			class1.CreateChildPermission({{Entity_Name_Plural_Here}}Permissions.BatchDelete, L("BatchDelete{{Entity_Name_Plural_Here}}"));
+			class1.CreateChildPermission({{Entity_Name_Plural_Here}}Permissions.ExportExcel, L("ExportToExcel"));
 
 
 			//// custom codes
@@ -53,7 +53,7 @@ namespace {{Namespace_Here}}.Authorization
 
 		private static ILocalizableString L(string name)
 		{
-			return new LocalizableString(name, {{ConfigScore}}AppConsts.LocalizationSourceName);
+			return new LocalizableString(name, {{ConfigScore}}Consts.LocalizationSourceName);
 		}
 	}
 }

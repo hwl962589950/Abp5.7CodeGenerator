@@ -77,5 +77,39 @@ namespace AbpCodeGenerator.Lib
         /// </summary>
         public static string Zh_CN_LocalizationDictionary_Path = _configuration["Zh_CN_LocalizationDictionary_Path"];
 
+
+
+
+        /// <summary>
+        /// 各大静态源
+        /// </summary>
+        public static string ConfigScore = _configuration["ConfigScore"];
+
+
+        /// <summary>
+        /// 需要生成代码路径
+        /// </summary>
+        public static string ItemPath = _configuration["ItemPath"];
+
+
+        /// <summary>
+        /// DbContext 得名字
+        /// </summary>
+        public static string DbContextName = _configuration["DbContextName"];
+
+        /// <summary>
+        /// 前端本地化源
+        /// </summary>
+        public static string LocalizationScore = _configuration["LocalizationScore"];
+
+        /// <summary>
+        /// 获取项目路径 .Core .Application
+        /// </summary>
+        /// <returns></returns>
+        public static string GetItemPath(string itemName)
+        {
+            return $"{Configuration.ItemPath}{Configuration.ConfigScore}.{itemName}\\";
+        }
+
     }
 }

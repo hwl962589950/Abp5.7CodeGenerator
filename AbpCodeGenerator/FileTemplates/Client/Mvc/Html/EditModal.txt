@@ -1,0 +1,18 @@
+﻿@using {{Namespace_Here}}.Web.Models.{{Entity_Name_Plural_Here}}
+@using {{Namespace_Here}}.Web.Models.Common.Modals
+@model Edit{{Entity_Name_Plural_Here}}ModalViewModel
+
+@await Html.PartialAsync("~/Views/Shared/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("Edit{{Entity_Name_Plural_Here}}")))
+<form name="{{Entity_Name_Plural_Here}}EditForm" role="form" class="form-horizontal">
+	<input type="hidden" name="Id" value="@Model.{{Entity_Name_Plural_Here}}.Id" />
+	<div class="modal-body">
+		<div class="tab-content mt-4">
+			<div role="tabpanel" class="tab-pane container animated fadeIn active" id="edit-user-details">
+{{Property_Looped_Template_Here}}				
+				
+			</div>
+		</div>
+	</div>
+	@await Html.PartialAsync("~/Views/Shared/Modals/_ModalFooterWithSaveAndCancel.cshtml")
+</form>
+<script src="~/view-resources/Views/{{Entity_Name_Plural_Here}}/_EditModal.js" asp-append-version="true"></script>

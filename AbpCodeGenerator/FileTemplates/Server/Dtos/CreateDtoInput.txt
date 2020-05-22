@@ -1,0 +1,17 @@
+﻿using System;
+using Abp.Application.Services.Dto;
+using System.ComponentModel.DataAnnotations;
+using Abp.AutoMapper;
+using NewAliExpress.DbEntity;
+
+namespace {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}s.Dtos
+{
+    /// <summary>
+	/// 创建 {{Entity_Name_Here}} Dto模型
+	/// </summary>
+    [AutoMap(typeof({{Entity_Name_Here}}))]
+    public class Create{{Entity_Name_Here}}Input 
+    {
+      {{Property_Looped_Template_Here}}
+    }
+}

@@ -1,0 +1,47 @@
+﻿namespace {{Namespace_Here}}.Authorization
+{
+	/// <summary>
+    /// 定义系统的权限名称的字符串常量。
+    /// <see cref="{{Entity_Name_Plural_Here}}AuthorizationProvider" />中对权限的定义.
+    ///</summary>
+	public static class {{Entity_Name_Plural_Here}}Permissions
+	{
+		/// <summary>
+		/// {{Entity_Name_Plural_Here}}权限节点
+		///</summary>
+		public const string Node = "Pages.{{Entity_Name_Plural_Here}}";
+
+		/// <summary>
+		/// {{Entity_Name_Plural_Here}}查询授权
+		///</summary>
+		public const string Query = "Pages.{{Entity_Name_Plural_Here}}.Query";
+
+		/// <summary>
+		/// {{Entity_Name_Plural_Here}}创建权限
+		///</summary>
+		public const string Create = "Pages.{{Entity_Name_Plural_Here}}.Create";
+
+		/// <summary>
+		/// {{Entity_Name_Plural_Here}}修改权限
+		///</summary>
+		public const string Edit = "Pages.{{Entity_Name_Plural_Here}}.Edit";
+
+		/// <summary>
+		/// {{Entity_Name_Plural_Here}}删除权限
+		///</summary>
+		public const string Delete = "Pages.{{Entity_Name_Plural_Here}}.Delete";
+
+        /// <summary>
+		/// {{Entity_Name_Plural_Here}}批量删除权限
+		///</summary>
+		public const string BatchDelete = "Pages.{{Entity_Name_Plural_Here}}.BatchDelete";
+
+		/// <summary>
+		/// {{Entity_Name_Plural_Here}}导出Excel
+		///</summary>
+		public const string ExportExcel="Pages.{{Entity_Name_Plural_Here}}.ExportExcel";
+         
+    }
+
+}
+

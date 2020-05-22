@@ -17,20 +17,19 @@ namespace AbpCodeGenerator.Lib
         /// <param name="className"></param>
         public static void SetControllerClass(string className, string primary_Key_Here)
         {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\ControllerClass\MainTemplate.txt";
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\ControllerClass\ControllersTemplate.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
 
+            var lowClassName = className.Substring(0, 1).ToLower() + className.Substring(1);
             templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
                                              .Replace("{{Namespace_Relative_Full_Here}}", className)
                                              .Replace("{{Entity_Name_Plural_Here}}", className)
+                                             .Replace("{{Entity_Name_Plural_Here_Low}}", GetFirstToLowerStr(className))
                                              .Replace("{{Entity_Name_Here}}", className)
-                                             .Replace("{{Permission_Name_Here}}", $"Pages_Administration_{className}")
-                                             .Replace("{{App_Area_Name_Here}}", Configuration.App_Area_Name)
                                              .Replace("{{Primary_Key_Here}}", primary_Key_Here)
-                                             .Replace("{{Project_Name_Here}}", Configuration.Controller_Base_Class)
-                                             .Replace("{{entity_Name_Plural_Here}}", GetFirstToLowerStr(className))
+                                             .Replace("{{Controller_Base_Class}}", Configuration.Controller_Base_Class)
                                              ;
-            Write(Configuration.Web_Mvc_Directory + "Areas\\Admin\\Controllers\\", className + "Controller.cs", templateContent);
+            Write(Configuration.Web_Mvc_Directory + "Controllers\\", className + "Controller.cs", templateContent);
         }
 
 
@@ -38,65 +37,62 @@ namespace AbpCodeGenerator.Lib
         /// 生成CreateOrEditHtmlTemplate
         /// </summary>
         /// <param name="className"></param>
-        public static void SetCreateOrEditHtmlTemplate(string className, List<MetaTableInfo> metaTableInfoList)
+        public static void SetCreateHtmlTemplate(string className, List<MetaTableInfo> metaTableInfoList)
         {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\CreateOrEditHtmlTemplate\MainTemplate.txt";
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\Html\_Create.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < metaTableInfoList.Count; i++)
+            foreach (var item in metaTableInfoList)
             {
-                sb.AppendLine("<div class=\"form-group m-form__group row\">");
-                if (i % 2 == 0)
-                {
-                    sb.AppendLine($"<label class=\"col-xl-1 col-lg-1 col-form-label\">{metaTableInfoList[i].Annotation}</label>");
-                    sb.AppendLine(" <div class=\"col-xl-5 col-lg-5\">");
-                    if (metaTableInfoList[i].PropertyType == "string")
-                    {
-                        sb.AppendLine("  <input class=\"form-control@(Model." + className + "." + metaTableInfoList[i].Name + ".IsNullOrEmpty() ? \"\" : \" edited\")\"");
-                    }
-                    else
-                    {
-                        sb.AppendLine("  <input class=\"form-control\"");
-                    }
-                    sb.AppendLine("type=\"text\" name=\"" + metaTableInfoList[i].Name + "\"");
-                    sb.AppendLine("value=\"@Model." + className + "." + metaTableInfoList[i].Name + "\" />");
-                    sb.AppendLine("</div>");
-
-                    if (i + 1 < metaTableInfoList.Count)
-                    {
-                        sb.AppendLine($"<label class=\"col-xl-1 col-lg-1 col-form-label\">{metaTableInfoList[i + 1].Annotation}</label>");
-                        sb.AppendLine(" <div class=\"col-xl-5 col-lg-5\">");
-                        if (metaTableInfoList[i + 1].PropertyType == "string")
-                        {
-                            // <input type="datetime"  class="form-control date-picker">
-                            sb.AppendLine("  <input class=\"form-control@(Model." + className + "." + metaTableInfoList[i + 1].Name + ".IsNullOrEmpty() ? \"\" : \" edited\")\"");
-                        }
-                        else
-                        {
-                            sb.AppendLine("  <input class=\"form-control\"");
-                        }
-                        sb.AppendLine("type=\"text\" name=\"" + metaTableInfoList[i + 1].Name + "\"");
-                        sb.AppendLine("value=\"@Model." + className + "." + metaTableInfoList[i + 1].Name + "\" />");
-                        sb.AppendLine("</div>");
-                    }
-                }
-
-
-                sb.AppendLine("</div> ");
+                if (item.Name.Equals("Id")) continue;
+                sb.Append("                            <div class=\"form-group row required\">\n");
+                sb.Append($"                                <label class=\"col-md-3 col-form-label\">@L(\"{item.Name}\")</label>\n");
+                sb.Append($"                                <div class=\"col-md-9\">\n");
+                sb.Append($"                                    <input type=\"text\" class=\"form-control\" name=\"{item.Name}\" required >\n");
+                sb.Append($"                                </div>\n");
+                sb.Append($"                            </div>\n");
             }
 
             var property_Looped_Template_Here = sb.ToString();
 
             templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
-                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
                                              .Replace("{{Entity_Name_Plural_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
-                                             .Replace("{{App_Area_Name_Here}}", Configuration.App_Area_Name)
+                                             .Replace("{{Entity_Name_Plural_Here_Low}}", GetFirstToLowerStr(className))
                                              .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
-                                             .Replace("{{entity_Name_Plural_Here}}", GetFirstToLowerStr(className))
                                              ;
-            Write(Configuration.Web_Mvc_Directory + "Areas\\Admin\\Views\\" + className + "\\", "_CreateOrEditModal.cshtml", templateContent);
+            Write(Configuration.Web_Mvc_Directory + "\\Views\\" + className + "\\", "_CreateModal.cshtml", templateContent);
+        }
+
+        /// <summary>
+        /// 生成CreateOrEditHtmlTemplate
+        /// </summary>
+        /// <param name="className"></param>
+        public static void SetUpdateHtmlTemplate(string className, List<MetaTableInfo> metaTableInfoList)
+        {
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\Html\EditModal.txt";
+            var templateContent = Read(appServiceIntercafeClassDirectory);
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in metaTableInfoList)
+            {
+                if (item.Name.Equals("Id")) continue;
+                sb.Append(" 				<div class=\"form-group row required\">\n");
+                sb.Append($"				     <label class=\"col-md-3 col-form-label\" for=\"{item.Name}\">@L(\"{item.Name}\")</label>\n");
+                sb.Append($"				     <div class=\"col-md-9\">\n");
+                sb.Append($"				         <input type=\"text\" class=\"form-control\" name=\"{item.Name}\" value=\"@Model.{className}.{item.Name}\" required >\n");
+                sb.Append($"				     </div>\n");
+                sb.Append($"				 </div>\n");
+            }
+
+            var property_Looped_Template_Here = sb.ToString();
+
+            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                             .Replace("{{Entity_Name_Plural_Here}}", className)
+                                             .Replace("{{Entity_Name_Plural_Here_Low}}", GetFirstToLowerStr(className))
+                                             .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
+                                             ;
+            Write(Configuration.Web_Mvc_Directory + "\\Views\\" + className + "\\", "EditModal.cshtml", templateContent);
         }
 
 
@@ -104,19 +100,17 @@ namespace AbpCodeGenerator.Lib
         /// 生成CreateOrEditJs
         /// </summary>
         /// <param name="className"></param>
-        public static void SetCreateOrEditJs(string className)
+        public static void SetUpdateJs(string className)
         {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\CreateOrEditJs\MainTemplate.txt";
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\Js\_EditModal.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
-
-            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
-                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
+            templateContent = templateContent
                                              .Replace("{{Entity_Name_Plural_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
                                              .Replace("{{entity_Name_Here}}", GetFirstToLowerStr(className))
-                                             .Replace("{{entity_Name_Plural_Here}}", GetFirstToLowerStr(className))
+                                             .Replace("{{Entity_Name_Plural_Here_Low}}", GetFirstToLowerStr(className))
+                                             .Replace("{{LocalizationScore}}", Configuration.LocalizationScore)
                                              ;
-            Write(Configuration.Web_Mvc_Directory + "\\wwwroot\\view-resources\\Areas\\Admin\\Views\\" + className + "\\", "_CreateOrEditModal.js", templateContent);
+            Write(Configuration.Web_Mvc_Directory + "\\wwwroot\\view-resources\\Views\\" + className + "\\", "_EditModal.js", templateContent);
         }
 
 
@@ -135,7 +129,7 @@ namespace AbpCodeGenerator.Lib
                                              .Replace("{{Entity_Name_Here}}", className)
                                              .Replace("{{App_Area_Name_Here}}", Configuration.App_Area_Name)
                                              ;
-            Write(Configuration.Web_Mvc_Directory + "Areas\\Admin\\Models\\" + className + "s\\", "CreateOrEdit" + className + "ModalViewModel.cs", templateContent);
+            Write(Configuration.Web_Mvc_Directory + "\\Models\\" + className + "\\", "Edit" + className + "ModalViewModel.cs", templateContent);
         }
 
 
@@ -145,25 +139,23 @@ namespace AbpCodeGenerator.Lib
         /// <param name="className"></param>
         public static void SetIndexHtmlTemplate(string className, List<MetaTableInfo> metaTableInfoList)
         {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\IndexHtmlTemplate\MainTemplate.txt";
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\IndexHtmlTemplate\Index.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
 
             StringBuilder sb = new StringBuilder();
 
             foreach (var item in metaTableInfoList)
             {
-                sb.AppendLine(" <th>" + item.Annotation + "</th>");
+                if (item.Name.Equals("Id")) continue;
+                sb.AppendLine($"											<th>@L(\"{item.Name}\")</th>");
             }
             var property_Looped_Template_Here = sb.ToString();
 
             templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
                                              .Replace("{{Entity_Name_Plural_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
-                                             .Replace("{{App_Area_Name_Here}}", Configuration.App_Area_Name)
                                              .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
-                                             .Replace("{{Permission_Name_Here}}", $"Pages_Administration_{className}")
                                              ;
-            Write(Configuration.Web_Mvc_Directory + "Areas\\Admin\\Views\\" + className + "\\", "Index.cshtml", templateContent);
+            Write(Configuration.Web_Mvc_Directory + "\\Views\\" + className + "\\", "Index.cshtml", templateContent);
         }
 
 
@@ -173,30 +165,30 @@ namespace AbpCodeGenerator.Lib
         /// <param name="className"></param>
         public static void SetIndexJsTemplate(string className, List<MetaTableInfo> metaTableInfoList)
         {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\IndexJsTemplate\MainTemplate.txt";
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Client\Mvc\Js\IndexJs.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
 
             StringBuilder sb = new StringBuilder();
             var i = 1;
             foreach (var item in metaTableInfoList)
             {
-                sb.AppendLine(", {");
-                sb.AppendLine("targets: " + i + ",");
-                sb.AppendLine("data: \"" + GetFirstToLowerStr(item.Name) + "\"");
-                sb.AppendLine("}");
+                if (item.Name.Equals("Id")) continue;
+                sb.AppendLine("			,{");
+                sb.AppendLine($"				targets: {i},\n");
+                sb.AppendLine($"				data: '{GetFirstToLowerStr(item.Name)}'\n");
+                sb.AppendLine("			 }");
                 i++;
             }
             var property_Looped_Template_Here = sb.ToString();
             templateContent = templateContent
                                              .Replace("{{Entity_Name_Plural_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
                                              .Replace("{{entity_Name_Here}}", GetFirstToLowerStr(className))
-                                             .Replace("{{entity_Name_Plural_Here}}", GetFirstToLowerStr(className))
-                                             .Replace("{{App_Area_Name_Here}}", Configuration.App_Area_Name)
+                                             .Replace("{{Entity_Name_Plural_Here_Low}}", GetFirstToLowerStr(className))
                                              .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
-                                             .Replace("{{Permission_Value_Here}}", "Pages.Administration." + className + "")
+                                             .Replace("{{LocalizationScore}}", Configuration.LocalizationScore)
+                                             .Replace("{{MaxColumn}}", i.ToString())
                                              ;
-            Write(Configuration.Web_Mvc_Directory + "\\wwwroot\\view-resources\\Areas\\Admin\\Views\\" + className + "\\", "Index.js", templateContent);
+            Write(Configuration.Web_Mvc_Directory + "\\wwwroot\\view-resources\\Views\\" + className + "\\", className+"Index.js", templateContent);
         }
 
         #endregion
@@ -214,12 +206,10 @@ namespace AbpCodeGenerator.Lib
             var templateContent = Read(appServiceIntercafeClassDirectory);
 
             templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
-                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
                                              .Replace("{{Entity_Name_Plural_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
                                              .Replace("{{Primary_Key_Inside_Tag_Here}}", primary_Key_Inside_Tag_Here)
                                              ;
-            Write(Configuration.Application_Directory + className + "s\\", "I" + className + "AppService.cs", templateContent);
+            Write(Configuration.GetItemPath("Application") + className + "s\\", "I" + className + "AppService.cs", templateContent);
         }
 
         /// <summary>
@@ -232,21 +222,17 @@ namespace AbpCodeGenerator.Lib
             string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\AppServiceClass\MainTemplate.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
             var Primary_Key_With_Comma_Here = Primary_Key_Inside_Tag_Here;
-            if (Primary_Key_Inside_Tag_Here != "int")
-            {
-                Primary_Key_With_Comma_Here = "," + Primary_Key_Inside_Tag_Here;
-            }
+            //if (Primary_Key_Inside_Tag_Here != "int")
+            //{
+            //    Primary_Key_With_Comma_Here = "," + Primary_Key_Inside_Tag_Here;
+            //}
             templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
-                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
                                              .Replace("{{Entity_Name_Plural_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
-                                             .Replace("{{Primary_Key_Inside_Tag_Here}}", Primary_Key_Inside_Tag_Here)
-                                             .Replace("{{entity_Name_Here}}", GetFirstToLowerStr(className))
-                                             .Replace("{{Permission_Name_Here}}", $"Pages_Administration_{className}")
-                                             .Replace("{{Project_Name_Here}}", Configuration.Application_AppServiceBase)
+                                             .Replace("{{Permission_Name_Here}}", $"{className}Permissions")
+                                             .Replace("{{DbContextName}}", Configuration.DbContextName)
                                              .Replace("{{Primary_Key_With_Comma_Here}}", Primary_Key_With_Comma_Here)
                                              ;
-            Write(Configuration.Application_Directory + className + "s\\", className + "AppService.cs", templateContent);
+            Write(Configuration.GetItemPath("Application") + className + "s\\", className + "AppService.cs", templateContent);
         }
 
         /// <summary>
@@ -313,70 +299,6 @@ namespace AbpCodeGenerator.Lib
         }
 
         #region Dtos
-
-        /// <summary>
-        /// 生成GetInputClass
-        /// </summary>
-        /// <param name="className"></param>
-        public static void SetGetInputClass(string className)
-        {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\GetInputClass\MainTemplate.txt";
-            var templateContent = Read(appServiceIntercafeClassDirectory);
-
-            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
-                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
-                                             ;
-            Write(Configuration.Application_Directory + className + "s\\Dtos\\", "Get" + className + "Input.cs", templateContent);
-        }
-
-
-        /// <summary>
-        /// 生成GetForEditOutputClass
-        /// </summary>
-        /// <param name="className"></param>
-        public static void SetGetForEditOutputClass(string className)
-        {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\GetForEditOutputClass\MainTemplate.txt";
-            var templateContent = Read(appServiceIntercafeClassDirectory);
-
-            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
-                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
-                                             ;
-            Write(Configuration.Application_Directory + className + "s\\Dtos\\", "Get" + className + "ForEditOutput.cs", templateContent);
-        }
-
-
-        /// <summary>
-        /// 生成ListDtoClass
-        /// </summary>
-        /// <param name="className"></param>
-        /// <param name="metaTableInfoList"></param>
-        public static void SetListDtoClass(string className, List<MetaTableInfo> metaTableInfoList)
-        {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\ListDtoClass\MainTemplate.txt";
-            var templateContent = Read(appServiceIntercafeClassDirectory);
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var item in metaTableInfoList)
-            {
-                sb.AppendLine("/// <summary>");
-                sb.AppendLine("/// " + item.Annotation);
-                sb.AppendLine("/// </summary>");
-                sb.AppendLine("public " + item.PropertyType + " " + item.Name + " { get; set; }");
-                sb.AppendLine("     ");
-            }
-            var property_Looped_Template_Here = sb.ToString();
-            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
-                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
-                                             .Replace("{{Entity_Name_Here}}", className)
-                                             .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
-                                             ;
-            Write(Configuration.Application_Directory + className + "s\\Dtos\\", className + "ListDto.cs", templateContent);
-        }
-
-
         /// <summary>
         /// 生成CreateOrEditInput
         /// </summary>
@@ -384,16 +306,16 @@ namespace AbpCodeGenerator.Lib
         /// <param name="metaTableInfoList"></param>
         public static void SetCreateOrEditInputClass(string className, List<MetaTableInfo> metaTableInfoList)
         {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\CreateOrEditInputClass\MainTemplate.txt";
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\CreateDtoInput.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
             StringBuilder sb = new StringBuilder();
 
             foreach (var item in metaTableInfoList)
             {
-                sb.AppendLine("/// <summary>");
-                sb.AppendLine("/// " + item.Annotation);
-                sb.AppendLine("/// </summary>");
-                sb.AppendLine("public " + item.PropertyType + (item.Name == "Id" ? "? " : " ") + item.Name + " { get; set; }");
+                sb.AppendLine("     /// <summary>");
+                sb.AppendLine("     /// " + item.Annotation);
+                sb.AppendLine("     /// </summary>");
+                sb.AppendLine("     public " + item.PropertyType + (item.Name == "Id" ? "? " : " ") + item.Name + " { get; set; }");
                 sb.AppendLine("     ");
             }
             var property_Looped_Template_Here = sb.ToString();
@@ -402,47 +324,157 @@ namespace AbpCodeGenerator.Lib
                                              .Replace("{{Entity_Name_Here}}", className)
                                              .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
                                              ;
-            Write(Configuration.Application_Directory + className + "s\\Dtos\\", "CreateOrEdit" + className + "Input.cs", templateContent);
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Application\\{className}s\\Dtos\\", "Create" + className + "Input.cs", templateContent);
         }
 
 
+
         /// <summary>
-        /// 生成ConstsClass
+        /// 生成  DeleteInputClass
         /// </summary>
         /// <param name="className"></param>
-        public static void SetConstsClass(string className)
+        /// <param name="metaTableInfoList"></param>
+        public static void SetDeleteInputClass(string className, List<MetaTableInfo> metaTableInfoList, string Primary_Key_Inside_Tag_Here)
         {
-            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\ConstsClass\MainTemplate.txt";
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\DeleteInput.txt";
             var templateContent = Read(appServiceIntercafeClassDirectory);
-
-            templateContent = templateContent.Replace("{{entity_Name_Here}}", GetFirstToLowerStr(className))
+            StringBuilder sb = new StringBuilder();
+            var property_Looped_Template_Here = sb.ToString();
+            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
                                              .Replace("{{Entity_Name_Here}}", className)
+                                             .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
+                                             .Replace("{{Primary_Key_Inside_Tag_Here}}", Primary_Key_Inside_Tag_Here)
                                              ;
-            Write(Configuration.Application_Directory + className + "s\\", className + "ConstsClass.txt", templateContent);
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Application\\{className}s\\Dtos\\", "Delete" + className + "Input.cs", templateContent);
         }
 
         /// <summary>
-        /// 生成AppPermissions
+        /// 生成  UpdateInputClass
         /// </summary>
         /// <param name="className"></param>
-        public static void SetAppPermissions(string className)
+        /// <param name="metaTableInfoList"></param>
+        public static void SetUpdateInputClass(string className, List<MetaTableInfo> metaTableInfoList, string Primary_Key_Inside_Tag_Here)
         {
-            StringBuilder sbAppPermissions_Here = new StringBuilder();
-            sbAppPermissions_Here.AppendLine($"#region {className}");
-            sbAppPermissions_Here.AppendLine($"public const string Pages_Administration_{className} = \"Pages.Administration.{className}\";");
-            sbAppPermissions_Here.AppendLine($"public const string Pages_Administration_{className}_Create = \"Pages.Administration.{className}.Create\";");
-            sbAppPermissions_Here.AppendLine($"public const string Pages_Administration_{className}_Edit = \"Pages.Administration.{className}.Edit\";");
-            sbAppPermissions_Here.AppendLine($"public const string Pages_Administration_{className}_Delete = \"Pages.Administration.{className}.Delete\";");
-            sbAppPermissions_Here.AppendLine(" #endregion");
-            sbAppPermissions_Here.AppendLine("                         ");
-            sbAppPermissions_Here.AppendLine(" //{{AppPermissions_Here}}");
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\UpdateInput.txt";
+            var templateContent = Read(appServiceIntercafeClassDirectory);
+            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
+                                             .Replace("{{Entity_Name_Here}}", className)
+                                             .Replace("{{Primary_Key_Inside_Tag_Here}}", Primary_Key_Inside_Tag_Here)
+                                             ;
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Application\\{className}s\\Dtos\\", "Update" + className + "Input.cs", templateContent);
+        }
 
-            var appPermissionsTemplateContent = Read(Configuration.AppPermissions_Path);
-            if (!appPermissionsTemplateContent.Contains($"Pages_Administration_{className}"))
+
+
+        /// <summary>
+        /// 生成  GetAllInputClass
+        /// </summary>
+        /// <param name="className"></param>
+        /// <param name="metaTableInfoList"></param>
+        public static void SetGetAllInputClass(string className, List<MetaTableInfo> metaTableInfoList)
+        {
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\GetAllInput.txt";
+            var templateContent = Read(appServiceIntercafeClassDirectory);
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in metaTableInfoList)
             {
-                appPermissionsTemplateContent = appPermissionsTemplateContent.Replace("//{{AppPermissions_Here}}", sbAppPermissions_Here.ToString());
-                Write(Configuration.AppPermissions_Path, appPermissionsTemplateContent);
+                if (item.FieldProp.IsClass && !item.FieldProp.Name.ToLower().Equals("string"))
+                    continue;
+                //判断是否是可空类型
+                var t = item.FieldProp.IsGenericType && item.FieldProp.GetGenericTypeDefinition().Equals(typeof(Nullable<>)) ? "":"?";
+                sb.AppendLine("     /// <summary>");
+                sb.AppendLine("     /// " + item.Annotation);
+                sb.AppendLine("     /// </summary>");
+                sb.AppendLine("     public " + item.PropertyType + t+"   " + item.Name + " { get; set; }");
+                sb.AppendLine("     ");
             }
+            var property_Looped_Template_Here = sb.ToString();
+            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
+                                             .Replace("{{Entity_Name_Here}}", className)
+                                             .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
+                                             ;
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Application\\{className}s\\Dtos\\", "GetAll" + className + "Input.cs", templateContent);
+        }
+
+        /// <summary>
+        /// 生成  GetInputClass
+        /// </summary>
+        /// <param name="className"></param>
+        /// <param name="metaTableInfoList"></param>
+        public static void SetGetInputClass(string className, List<MetaTableInfo> metaTableInfoList, string Primary_Key_Inside_Tag_Here)
+        {
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\GetInput.txt";
+            var templateContent = Read(appServiceIntercafeClassDirectory);
+            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
+                                             .Replace("{{Entity_Name_Here}}", className)
+                                             .Replace("{{Primary_Key_Inside_Tag_Here}}", Primary_Key_Inside_Tag_Here)
+                                             ;
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Application\\{className}s\\Dtos\\", "Get" + className + "Input.cs", templateContent);
+        }
+
+
+        /// <summary>
+        /// 生成  DtoOut
+        /// </summary>
+        /// <param name="className"></param>
+        /// <param name="metaTableInfoList"></param>
+        public static void SetDtoOutClass(string className, List<MetaTableInfo> metaTableInfoList,string Primary_Key_Inside_Tag_Here)
+        {
+            string appServiceIntercafeClassDirectory = Configuration.RootDirectory + @"\Server\Dtos\DtoOut.txt";
+            var templateContent = Read(appServiceIntercafeClassDirectory);
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var item in metaTableInfoList)
+            {
+                if (item.Name.Equals("Id")) continue;
+                sb.AppendLine("		/// <summary>");
+                sb.AppendLine("		/// " + item.Annotation);
+                sb.AppendLine("		/// </summary>");
+                sb.AppendLine("		public " + item.PropertyType  + "  " + item.Name + " { get; set; }");
+                sb.AppendLine("		");
+            }
+            var property_Looped_Template_Here = sb.ToString();
+            templateContent = templateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                             .Replace("{{Namespace_Relative_Full_Here}}", className)
+                                             .Replace("{{Entity_Name_Here}}", className)
+                                             .Replace("{{Primary_Key_Inside_Tag_Here}}", Primary_Key_Inside_Tag_Here)
+                                             .Replace("{{Property_Looped_Template_Here}}", property_Looped_Template_Here)
+                                             ;
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Application\\{className}s\\Dtos\\",  className + "DtoOut.cs", templateContent);
+
+        }
+
+
+        /// <summary>
+        /// 生成 AuthorizationPermissions
+        /// </summary>
+        /// <param name="className"></param>
+        public static void SetAuthorizationPermissions(string className)
+        {
+            //读取模板
+            var appPermissionsTemplateContent = Read(Configuration.RootDirectory + @"\Server\Authorization\AuthorizationPermissions.txt");
+            appPermissionsTemplateContent = appPermissionsTemplateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                                                         .Replace("{{Entity_Name_Plural_Here}}", className)
+                                                                         .Replace("{{ConfigScore}}", Configuration.ConfigScore);
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Core\\Authorization\\{className}s\\", $"{className}Permissions.cs", appPermissionsTemplateContent);
+        }
+
+        /// <summary>
+        /// 生成 AuthorizationProvider
+        /// </summary>
+        /// <param name="className"></param>
+        public static void SetAuthorizationProvider(string className)
+        {
+            //读取模板
+            var appPermissionsTemplateContent =Read(Configuration.RootDirectory + @"\Server\Authorization\AuthorizationProvider.txt");
+            appPermissionsTemplateContent=appPermissionsTemplateContent.Replace("{{Namespace_Here}}", Configuration.Namespace_Here)
+                                         .Replace("{{Entity_Name_Plural_Here}}", className)
+                                         .Replace("{{ConfigScore}}", Configuration.ConfigScore);
+            Write($"{Configuration.ItemPath}{Configuration.ConfigScore}.Core\\Authorization\\{className}s\\", $"{className}Provider.cs",appPermissionsTemplateContent);
         }
 
         /// <summary>
@@ -529,6 +561,13 @@ namespace AbpCodeGenerator.Lib
             {
                 Directory.CreateDirectory(filePath);
             }
+            if(File.Exists(filePath+ fileName))
+            {
+                Console.WriteLine(filePath + fileName +"文件存在了");
+                //return;
+            }
+
+
             using (FileStream fs = new FileStream(filePath + fileName, FileMode.Create))
             {
                 //获得字节数组

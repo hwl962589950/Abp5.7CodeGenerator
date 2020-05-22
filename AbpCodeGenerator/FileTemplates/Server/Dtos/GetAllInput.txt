@@ -1,0 +1,16 @@
+﻿using Abp.Application.Services.Dto;
+using NewAliExpress.DbEntity;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}s.Dtos
+{
+	/// <summary>
+	/// 查询 {{Entity_Name_Here}} 排序分页 Dto模型
+	/// </summary>
+	public class GetAll{{Entity_Name_Here}}Input: PagedAndSortedResultRequestDto
+	{
+		{{Property_Looped_Template_Here}}
+	}
+}

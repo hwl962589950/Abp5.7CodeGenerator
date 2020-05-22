@@ -1,0 +1,173 @@
+﻿(function ($) {
+	var _{{Entity_Name_Plural_Here_Low}}Service = abp.services.app.{{Entity_Name_Plural_Here_Low}},
+		l = abp.localization.getSource('{{LocalizationScore}}'),
+		//创建的
+		_$modal = $('#{{Entity_Name_Plural_Here}}CreateModal'),
+		_$form = _$modal.find('form'),
+		//渲染数据的表单
+		_$table = $('#{{Entity_Name_Plural_Here}}Table');
+
+	var _${{Entity_Name_Plural_Here_Low}}sTable = _$table.DataTable({
+		paging: true,
+		serverSide: true,
+		ajax: function (data, callback, settings) {
+			//搜索表单
+			var filter = $('#{{Entity_Name_Plural_Here}}sSearchForm').serializeFormToObject(true);
+			filter.maxResultCount = data.length;
+			filter.skipCount = data.start;
+
+			abp.ui.setBusy(_$table);
+			_{{Entity_Name_Plural_Here_Low}}Service.getAll(filter).done(function (result) {
+				callback({
+					recordsTotal: result.totalCount,
+					recordsFiltered: result.totalCount,
+					data: result.items
+				});
+			}).always(function () {
+				abp.ui.clearBusy(_$table);
+			});
+		},
+		buttons: [
+			{
+				name: 'refresh',
+				text: '<i class="fas fa-redo-alt"></i>',
+				action: () => _${{Entity_Name_Plural_Here_Low}}sTable.draw(false)
+			}
+		],
+		responsive: {
+			details: {
+				type: 'column'
+			}
+		},
+		columnDefs: [
+			{
+				targets: 0,
+				className: 'control',
+				defaultContent: '',
+			}
+{{Property_Looped_Template_Here}}			
+			,
+			{
+				targets: {{MaxColumn}},
+				data: null,
+				sortable: false,
+				autoWidth: false,
+				defaultContent: '',
+				render: (data, type, row, meta) => {
+					return [
+						`   <button type="button" class="btn btn-sm bg-secondary edit-{{Entity_Name_Plural_Here_Low}}" data-{{Entity_Name_Plural_Here_Low}}-id="${row.id}" data-toggle="modal" data-target="#{{Entity_Name_Plural_Here}}EditModal">`,
+						`       <i class="fas fa-pencil-alt"></i> ${l('Edit')}`,
+						'   </button>',
+						`   <button type="button" class="btn btn-sm bg-danger edit-{{Entity_Name_Plural_Here_Low}} delete-{{Entity_Name_Plural_Here_Low}}" data-{{Entity_Name_Plural_Here_Low}}-id="${row.id}" data-{{Entity_Name_Plural_Here_Low}}-name="${row.id}">`,
+						`       <i class="fas fa-trash"></i> ${l('Delete')}`,
+						'   </button>'
+					].join('');
+				}
+			}
+		]
+	});
+
+	_$form.validate({
+		rules: {
+			Password: "required",
+			ConfirmPassword: {
+				equalTo: "#Password"
+			}
+		}
+	});
+
+	//新增的按钮
+	_$form.find('.save-button').on('click', (e) => {
+		e.preventDefault();
+
+		if (!_$form.valid()) {
+			return;
+		}
+
+		var {{Entity_Name_Plural_Here_Low}} = _$form.serializeFormToObject();
+		var _$roleCheckboxes = $("input[name='role']:checked");
+		if (_$roleCheckboxes) {
+			for (var roleIndex = 0; roleIndex < _$roleCheckboxes.length; roleIndex++) {
+				var _$roleCheckbox = $(_$roleCheckboxes[roleIndex]);
+				{{Entity_Name_Plural_Here_Low}}.roleNames.push(_$roleCheckbox.val());
+			}
+		}
+
+		abp.ui.setBusy(_$modal);
+		_{{Entity_Name_Plural_Here_Low}}Service.create({{Entity_Name_Plural_Here_Low}}).done(function () {
+			_$modal.modal('hide');
+			_$form[0].reset();
+			abp.notify.info(l('SavedSuccessfully'));
+			_${{Entity_Name_Plural_Here_Low}}sTable.ajax.reload();
+		}).always(function () {
+			abp.ui.clearBusy(_$modal);
+		});
+	});
+
+	//删除单条的按钮
+	$(document).on('click', '.delete-{{Entity_Name_Plural_Here_Low}}', function () {
+		var {{Entity_Name_Plural_Here_Low}}Id = $(this).attr("data-{{Entity_Name_Plural_Here_Low}}-id");
+		var {{Entity_Name_Plural_Here_Low}}Name = $(this).attr('data-{{Entity_Name_Plural_Here_Low}}-name');
+
+		delete{{Entity_Name_Plural_Here}}({{Entity_Name_Plural_Here_Low}}Id, {{Entity_Name_Plural_Here_Low}}Name);
+	});
+	function delete{{Entity_Name_Plural_Here}}({{Entity_Name_Plural_Here_Low}}Id, {{Entity_Name_Plural_Here_Low}}Name) {
+		abp.message.confirm(
+			abp.utils.formatString(
+				l('AreYouSureWantToDelete'),
+				{{Entity_Name_Plural_Here_Low}}Name),
+			null,
+			(isConfirmed) => {
+				if (isConfirmed) {
+					_{{Entity_Name_Plural_Here_Low}}Service.delete({
+						id: {{Entity_Name_Plural_Here_Low}}Id
+					}).done(() => {
+						abp.notify.info(l('SuccessfullyDeleted'));
+						_${{Entity_Name_Plural_Here_Low}}sTable.ajax.reload();
+					});
+				}
+			}
+		);
+	}
+
+	//编辑用户
+	$(document).on('click', '.edit-{{Entity_Name_Plural_Here_Low}}', function (e) {
+		var {{Entity_Name_Plural_Here_Low}}Id = $(this).attr("data-{{Entity_Name_Plural_Here_Low}}-id");
+
+		e.preventDefault();
+		abp.ajax({
+			url: abp.appPath + '{{Entity_Name_Plural_Here}}/EditModal?Id=' + {{Entity_Name_Plural_Here_Low}}Id,
+			type: 'POST',
+			dataType: 'html',
+			success: function (content) {
+				$('#{{Entity_Name_Plural_Here}}EditModal div.modal-content').html(content);
+			},
+			error: function (e) { }
+		});
+	});
+
+	$(document).on('click', 'a[data-target="#{{Entity_Name_Plural_Here}}CreateModal"]', (e) => {
+		$('.nav-tabs a[href="#{{Entity_Name_Plural_Here_Low}}-details"]').tab('show')
+	});
+
+	abp.event.on('{{Entity_Name_Plural_Here_Low}}.edited', (data) => {
+		_${{Entity_Name_Plural_Here_Low}}sTable.ajax.reload();
+	});
+
+	_$modal.on('shown.bs.modal', () => {
+		_$modal.find('input:not([type=hidden]):first').focus();
+	}).on('hidden.bs.modal', () => {
+		_$form.clearForm();
+	});
+
+	$('.btn-search').on('click', (e) => {
+		_${{Entity_Name_Plural_Here_Low}}sTable.ajax.reload();
+	});
+
+	$('.txt-search').on('keypress', (e) => {
+		if (e.which == 13) {
+			_${{Entity_Name_Plural_Here_Low}}sTable.ajax.reload();
+			return false;
+		}
+	});
+})(jQuery);

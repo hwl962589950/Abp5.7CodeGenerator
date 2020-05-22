@@ -1,0 +1,79 @@
+﻿@using {{Namespace_Here}}.Authorization;
+@{
+	ViewData["Title"] = "Index";
+}
+@section scripts{
+	
+		<script src="~/view-resources/Views/{{Entity_Name_Plural_Here}}/{{Entity_Name_Plural_Here}}Index.js" asp-append-version="true"></script>
+	
+}
+<section class="content-header">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-sm-6">
+				<h1>@L("{{Entity_Name_Plural_Here}}s")</h1>
+			</div>
+			@if (IsGranted({{Entity_Name_Plural_Here}}Permissions.Create))
+			{
+				<div class="col-sm-6">
+					<a href="javascript:;" data-toggle="modal" data-target="#{{Entity_Name_Plural_Here}}CreateModal" class="btn bg-blue float-sm-right">
+						<i class="fa fa-plus-square"></i>
+						@L("Create")
+					</a>
+				</div>
+			}
+		</div>
+		</div>
+	</section>
+	<section class="content">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-12">
+					<div class="card">
+						<div class="card-header">
+							<div class="row">
+								<div class="col-md-6">
+									<!--Use for bulk actions-->
+								</div>
+								<div class="col-md-6">
+									<div class="abp-advanced-search">
+										<form id="{{Entity_Name_Plural_Here}}sSearchForm" class="form-horizontal">
+											<div class="input-group">
+												
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="table-responsive">
+								<table id="{{Entity_Name_Plural_Here}}Table" class="table table-striped table-bordered">
+									<thead>
+										<tr>
+											<th></th>
+{{Property_Looped_Template_Here}}
+											<th style="width: 150px">@L("Actions")</th>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!--创建的页面-->
+	@await Html.PartialAsync("~/Views/{{Entity_Name_Plural_Here}}/_CreateModal.cshtml")
+
+	<div class="modal fade" id="{{Entity_Name_Plural_Here}}EditModal" tabindex="-1" role="dialog" aria-labelledby="{{Entity_Name_Plural_Here}}EditModalLabel" data-backdrop="static">
+		<div class="modal-dialog modal-lg" role="document">
+			<div class="modal-content">
+			</div>
+		</div>
+	</div>
+
+
