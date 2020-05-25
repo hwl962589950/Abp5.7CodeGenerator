@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Abp.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -54,15 +55,20 @@ namespace AbpCodeGenerator.Lib
         /// </summary>
         /// <param name="className">类名</param>
         /// <returns></returns>
-        public static List<MetaTableInfo> GetMetaTableInfoListForAssembly(string className)
+        public static List<ClassInfoType> GetMetaTableInfoListForAssembly()
         {
 
-            var list = new List<MetaTableInfo>();
-            Type[] types = Assembly.LoadFrom(Configuration.SourceAssembly).GetTypes();
-            foreach (var type in types)
+            var resultList = new List<ClassInfoType>();
+
+            var types = Assembly.LoadFrom(Configuration.SourceAssembly).GetTypes().Where(s =>
+			s.Namespace != null &&
+			s.Namespace.StartsWith(Configuration.EntityNamespace) &&
+			s.IsClass &&
+            (s.IsSubclassOf(typeof(Entity)) ||
+            s.BaseType.IsGenericType &&
+            s.BaseType.GetGenericTypeDefinition() == typeof(Entity<>))).ToArray();
+			foreach (var type in types)
             {
-                if (type.Name.Equals(className))
-                {
                     var classAnnotation = string.Empty;
                     try
                     {
@@ -70,13 +76,13 @@ namespace AbpCodeGenerator.Lib
                         XmlElement xmlFromType = DocsByReflection.XMLFromType(type.GetTypeInfo());
                         classAnnotation = xmlFromType["summary"].InnerText.Trim();
                     }
-                    catch
+                    catch(Exception ex)
                     {
 
 
                     }
-
-                    foreach (PropertyInfo properties in type.GetProperties())
+                var list = new List<MetaTableInfo>();
+                foreach (PropertyInfo properties in type.GetProperties())
                     {
                         var metaTableInfo = new MetaTableInfo();
                         try
@@ -133,11 +139,16 @@ namespace AbpCodeGenerator.Lib
                             metaTableInfo.PropertyType = properties.PropertyType.ToString().Split('.').Last().Replace("]", "");
                         }
                         list.Add(metaTableInfo);
-                    }
                 }
+                resultList.Add(new ClassInfoType()
+                {
+                     ClassName=type.Name,
+                      MetaTableInfos=list,
+                       ObjType=type
+                });
             }
 
-            return list;
+            return resultList;
         }
 
 

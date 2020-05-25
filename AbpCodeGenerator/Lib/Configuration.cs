@@ -102,6 +102,12 @@ namespace AbpCodeGenerator.Lib
         /// </summary>
         public static string LocalizationScore = _configuration["LocalizationScore"];
 
+
+        /// <summary>
+        /// 获取生成实体类的完整命名空间
+        /// </summary>
+        public static string EntityNamespace = _configuration["EntityNamespace"];
+
         /// <summary>
         /// 获取项目路径 .Core .Application
         /// </summary>

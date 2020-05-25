@@ -564,7 +564,7 @@ namespace AbpCodeGenerator.Lib
             if(File.Exists(filePath+ fileName))
             {
                 Console.WriteLine(filePath + fileName +"文件存在了");
-                //return;
+                return;
             }
 
 
